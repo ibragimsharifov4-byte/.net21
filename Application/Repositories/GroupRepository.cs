@@ -9,14 +9,14 @@ public class GroupRepository(Database database) : IGroupRepository
 {
     private Database _data = database;
 
-    public void AddGroup(Group group)
+    public async Task AddGroup(Group group)
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
-            insert into groups(groupname, courseid, mentorid, startdate, enddate)
-            values(@GroupName, @CourseId, @MentorId, @StartDate, @EndDate)";
-        var result = con.Execute(query, group);
+        insert into groups(groupname, courseid, mentorid, startdate, enddate)
+        values(@GroupName, @CourseId, @MentorId, @StartDate, @EndDate)";
+        var result = await con.ExecuteAsync(query, group);
         if (result > 0)
         {
             Console.WriteLine("Group added successfully");
@@ -27,14 +27,12 @@ public class GroupRepository(Database database) : IGroupRepository
         }
     }
 
-
-
-    public void DeleteGroup(int id)
+    public async Task DeleteGroup(int id)
     {
         using var con = _data.Connection();
         con.Open();
         var query = "delete from groups where groupid = @id";
-        var result = con.Execute(query, new { id });
+        var result = await con.ExecuteAsync(query, new { id });
         if (result > 0)
         {
             Console.WriteLine("Group is deleted");
@@ -45,41 +43,45 @@ public class GroupRepository(Database database) : IGroupRepository
         }
     }
 
-    public Group? GetGroup(int id)
+    public async Task<Group?> GetGroup(int id)
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select * from groups where groupid = @id";
-        var result = con.QueryFirstOrDefault<Group>(query, new { id });
+        var result = await con.QueryFirstOrDefaultAsync<Group>(query, new { id });
         if (result == null)
         {
             Console.WriteLine("Group not found");
+            return null;
         }
-        return result;
+        else
+        {
+            return result;
+        }
     }
 
-    public List<Group> GetGroups()
+    public async Task<List<Group>> GetGroups()
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select * from groups";
-        var result = con.Query<Group>(query).ToList();
-        return result;
+        var result = await con.QueryAsync<Group>(query);
+        return result.ToList();
     }
 
-    public void UpdateGroup(Group group)
+    public async Task UpdateGroup(Group group)
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
-            update groups
-            set groupname = @GroupName,
-                courseid = @CourseId,
-                mentorid = @MentorId,
-                startdate = @StartDate,
-                enddate = @EndDate
-            where groupid = @GroupId";
-        var result = con.Execute(query, group);
+        update groups
+        set groupname = @GroupName,
+        courseid = @CourseId,
+        mentorid = @MentorId,
+        startdate = @StartDate,
+        enddate = @EndDate
+        where groupid = @GroupId";
+        var result = await con.ExecuteAsync(query, group);
         if (result > 0)
         {
             Console.WriteLine("Group updated successfully");
@@ -90,37 +92,38 @@ public class GroupRepository(Database database) : IGroupRepository
         }
     }
 
-    public int GetTotalGroupsCount()
+    public async Task<int> GetTotalGroupsCount()
     {
         using var con = _data.Connection();
         con.Open();
-        var query = "select count(distinct groupid) from groups";
-        var result = con.ExecuteScalar<int>(query);
+        var query = "select count(*) from groups";
+        var result = await con.ExecuteScalarAsync<int>(query);
         return result;
     }
 
-    public List<DateTime> GetAllStartDates()
+    public async Task<List<DateTime>> GetAllStartDates()
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select distinct startdate from groups order by startdate";
-        var result = con.Query<DateTime>(query).ToList();
-        return result;
+        var result = await con.QueryAsync<DateTime>(query);
+        return result.ToList();
     }
 
-    public List<Group> GetStudentsPerGroup()
+    public async Task<List<Group>> GetStudentsPerGroup()
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
-            select g.groupid as GroupId,
-            g.groupname as GroupName,
-            count(sg.studentid) as StudentsCount
-            from groups g
-            left join studentgroups sg on g.groupid = sg.groupid
-            group by g.groupid, g.groupname
-            order by g.groupid";
-        var result = con.Query<Group>(query).ToList();
-        return result;
+        select
+        g.groupid as GroupId,
+        g.groupname as GroupName,
+        count(sg.studentid) as StudentsCount
+        from groups g
+        left join studentgroups sg on g.groupid = sg.groupid
+        group by g.groupid, g.groupname
+        order by g.groupid";
+        var result = await con.QueryAsync<Group>(query);
+        return result.ToList();
     }
 }

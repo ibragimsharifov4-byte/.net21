@@ -1,4 +1,3 @@
-
 using Application.Data;
 using Dapper;
 using Domain.Interfaces;
@@ -10,14 +9,17 @@ public class MentorRepository(Database database) : IMentorRepository
 {
     private Database _data = database;
 
-    public void AddMentor(Mentor mentor)
+    public async Task AddMentor(Mentor mentor)
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = @"
             insert into mentors(fullname, email, phone, specialization)
             values(@Fullname, @Email, @Phone, @Specialization)";
-        var result = con.Execute(query, mentor);
+
+        var result = await con.ExecuteAsync(query, mentor);
+
         if (result > 0)
         {
             Console.WriteLine("Mentor added successfully");
@@ -28,12 +30,15 @@ public class MentorRepository(Database database) : IMentorRepository
         }
     }
 
-    public void DeleteMentor(int id)
+    public async Task DeleteMentor(int id)
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = "delete from mentors where mentorid = @id";
-        var result = con.Execute(query, new { id });
+
+        var result = await con.ExecuteAsync(query, new { id });
+
         if (result > 0)
         {
             Console.WriteLine("Mentor is deleted");
@@ -44,32 +49,43 @@ public class MentorRepository(Database database) : IMentorRepository
         }
     }
 
-    public Mentor? GetMentor(int id)
+    public async Task<Mentor?> GetMentor(int id)
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = "select * from mentors where mentorid = @id";
-        var result = con.QueryFirstOrDefault<Mentor>(query, new { id });
+
+        var result = await con.QueryFirstOrDefaultAsync<Mentor>(query, new { id });
+
         if (result == null)
         {
             Console.WriteLine("Mentor not found");
+            return null;
         }
-        return result;
+        else
+        {
+            return result;
+        }
     }
 
-    public List<Mentor> GetMentors()
+    public async Task<List<Mentor>> GetMentors()
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = "select * from mentors";
-        var result = con.Query<Mentor>(query).ToList();
-        return result;
+
+        var result = await con.QueryAsync<Mentor>(query);
+
+        return result.ToList();
     }
 
-    public void UpdateMentor(Mentor mentor)
+    public async Task UpdateMentor(Mentor mentor)
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = @"
             update mentors
             set fullname = @Fullname,
@@ -77,7 +93,9 @@ public class MentorRepository(Database database) : IMentorRepository
                 phone = @Phone,
                 specialization = @Specialization
             where mentorid = @MentorId";
-        var result = con.Execute(query, mentor);
+
+        var result = await con.ExecuteAsync(query, mentor);
+
         if (result > 0)
         {
             Console.WriteLine("Mentor updated successfully");
@@ -88,12 +106,15 @@ public class MentorRepository(Database database) : IMentorRepository
         }
     }
 
-    public int GetTotalMentorsCount()
+    public async Task<int> GetTotalMentorsCount()
     {
         using var con = _data.Connection();
         con.Open();
+
         var query = "select count(*) from mentors";
-        var result = con.ExecuteScalar<int>(query);
+
+        var result = await con.ExecuteScalarAsync<int>(query);
+
         return result;
     }
 }

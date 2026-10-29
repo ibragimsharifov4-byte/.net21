@@ -6,9 +6,9 @@ namespace Domain.Interfaces;
 
 public interface IGroupRepository
 {
-    void AddGroup(Group group);
-    void DeleteGroup(int id);
-    void UpdateGroup(Group group);
-    List<Group> GetGroups();
-    Group GetGroup(int id);
+    Task AddGroup(Group group);
+    Task DeleteGroup(int id);
+    Task UpdateGroup(Group group);
+    Task<List<Group>> GetGroups();
+    Task<Group?> GetGroup(int id);
 }

@@ -9,14 +9,14 @@ public class CourseRepository(Database database) : ICourseRepository
 {
     private Database _data = database;
 
-    public void AddCourse(Course course)
+    public async Task AddCourse(Course course)
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
             insert into courses(title, description, durationweek)
             values(@Title, @Description, @Durationweek)";
-        var result = con.Execute(query, course);
+        var result = await con.ExecuteAsync(query, course);
         if (result > 0)
         {
             Console.WriteLine("Course added successfully");
@@ -27,12 +27,12 @@ public class CourseRepository(Database database) : ICourseRepository
         }
     }
 
-    public void DeleteCourse(int id)
+    public async Task DeleteCourse(int id)
     {
         using var con = _data.Connection();
         con.Open();
         var query = "delete from courses where courseid = @id";
-        var result = con.Execute(query, new { id });
+        var result = await con.ExecuteAsync(query, new { id });
         if (result > 0)
         {
             Console.WriteLine("Course is deleted");
@@ -43,39 +43,43 @@ public class CourseRepository(Database database) : ICourseRepository
         }
     }
 
-    public Course? GetCourse(int id)
+    public async Task<Course?> GetCourse(int id)
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select * from courses where courseid = @id";
-        var result = con.QueryFirstOrDefault<Course>(query, new { id });
+        var result = await con.QueryFirstOrDefaultAsync<Course>(query, new { id });
         if (result == null)
         {
             Console.WriteLine("Course not found");
+            return null;
         }
-        return result;
+        else
+        {
+            return result;
+        }
     }
 
-    public List<Course> GetCourses()
+    public async Task<List<Course>> GetCourses()
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select * from courses";
-        var result = con.Query<Course>(query).ToList();
-        return result;
+        var result = await con.QueryAsync<Course>(query);
+        return result.ToList();
     }
 
-    public void UpdateCourse(Course course)
+    public async Task UpdateCourse(Course course)
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
-            update courses
-            set title = @Title,
-                description = @Description,
-                durationweek = @Durationweek
-            where courseid = @CourseId";
-        var result = con.Execute(query, course);
+        update courses
+        set title = @Title,
+        description = @Description,
+        durationweek = @Durationweek
+        where courseid = @CourseId";
+        var result = await con.ExecuteAsync(query, course);
         if (result > 0)
         {
             Console.WriteLine("Course updated successfully");
@@ -86,39 +90,40 @@ public class CourseRepository(Database database) : ICourseRepository
         }
     }
 
-    public int GetTotalCoursesCount()
+    public async Task<int> GetTotalCoursesCount()
     {
         using var con = _data.Connection();
         con.Open();
-        var query = "select count(distinct courseid) from courses";
-        var result = con.ExecuteScalar<int>(query);
+        var query = "select count(*) from courses";
+        var result = await con.ExecuteScalarAsync<int>(query);
         return result;
     }
 
-    public List<Course> GetStudentsPerCourse()
+    public async Task<List<Course>> GetStudentsPerCourse()
     {
-    using var con = _data.Connection();
-    con.Open();
-
-    var query = @"
-        select c.courseid,
-        c.title,
-        count(distinct sg.studentid)
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select
+        c.courseid as CourseId,
+        c.title as Title,
+        count(distinct sg.studentid) as StudentsCount
         from courses c
         left join groups g on c.courseid = g.courseid
         left join studentgroups sg on g.groupid = sg.groupid
         group by c.courseid, c.title
         order by StudentsCount desc";
-    var result = con.Query<Course>(query).ToList();
-    return result;
+        var result = await con.QueryAsync<Course>(query);
+        return result.ToList();
     }
-    
-    public List<Course> GetLeastPopularCourses()
+
+    public async Task<List<Course>> GetLeastPopularCourses()
     {
         using var con = _data.Connection();
         con.Open();
         var query = @"
-        select c.courseid as CourseId,
+        select
+        c.courseid as CourseId,
         c.title as Title,
         count(distinct sg.studentid) as StudentsCount
         from courses c
@@ -127,8 +132,7 @@ public class CourseRepository(Database database) : ICourseRepository
         group by c.courseid, c.title
         order by StudentsCount, c.courseid
         limit 3";
-        var result = con.Query<Course>(query).ToList();
-        return result;
+        var result = await con.QueryAsync<Course>(query);
+        return result.ToList();
     }
 }
-

@@ -4,9 +4,9 @@ namespace Domain.Interfaces;
 
 public interface IMentorRepository
 {
-    void AddMentor(Mentor mentor);
-    void DeleteMentor(int id);
-    void UpdateMentor(Mentor mentor);
-    List<Mentor> GetMentors();
-    Mentor GetMentor(int id);
+    Task AddMentor(Mentor mentor);
+    Task DeleteMentor(int id);
+    Task UpdateMentor(Mentor mentor);
+    Task<List<Mentor>> GetMentors();
+    Task<Mentor> GetMentor(int id);
 }

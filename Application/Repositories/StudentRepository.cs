@@ -9,13 +9,13 @@ namespace Application.Repositories;
 public class StudentRepository(Database database) : IStudentRepository
 {
     private Database _data = database;
-    public void AddStudent(Student student)
+    public async Task AddStudent(Student student)
     {
         using var con = _data.Connection();
         con.Open();
         var query =
         "insert into students(fullname , email , phone , enrollmentdate) values(@fullname , @email , @phone , @enrollmentdate)";
-        var Student = con.Execute(query, student);
+        var Student = await con.ExecuteAsync(query, student);
         if (Student > 0)
         {
             Console.WriteLine("Student added successfully");
@@ -26,13 +26,13 @@ public class StudentRepository(Database database) : IStudentRepository
         }
     }
 
-    public void DeleteStudent(int id)
+    public async Task DeleteStudent(int id)
     {
         using var con = _data.Connection();
         con.Open();
         var query =
         "delete from students where studentid = @id";
-        var Deleting = con.Execute(query, new { id });
+        var Deleting = await con.ExecuteAsync(query, new { id });
         if (Deleting > 0)
         {
             System.Console.WriteLine("Student is deleted");
@@ -43,36 +43,38 @@ public class StudentRepository(Database database) : IStudentRepository
         }
     }
 
-    public Student GetStudent(int id)
+    public async Task<Student> GetStudent(int id)
     {
         using var con = _data.Connection();
         con.Open();
-        var result = con.QueryFirstOrDefault<Student>("select * from students where studentid = @id", new { id });
-        if (result == null)
+        var query = "select * from students where studentid = @id";
+        var result = await con.QueryFirstOrDefaultAsync<Student>(query, new { id });
+        if(result == null)
         {
-            Console.WriteLine("Student not found");
+            System.Console.WriteLine("Student not found");
+            return null;
         }
-        return result;
+        else
+        {
+            return result;
+        }
     }
 
-    public List<Student> GetStudents()
+    public async Task<List<Student>> GetStudents()
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select * from students";
-        var result = con.Query<Student>(query).ToList();
-        return result;
+        var result = await con.QueryAsync<Student>(query);
+        return result.ToList();
     }
 
-    public void UpdateStudent(Student student)
+    public async Task UpdateStudent(Student student)
     {
         using var con = _data.Connection();
         con.Open();
-        var query =
-        @"update students 
-        set studentid = @studentid , fullname = @fullname , email = @email , phone = @phone , enrollmentdate = @enrollmentdate
-        where studentid = @id";
-        var result = con.Execute(query, student);
+        var query = "update students set fullname = @fullname, email = @email, phone = @phone, enrollmentdate = @enrollmentdate where studentid = @studentid";
+        var result = await con.ExecuteAsync(query, student);
         if (result > 0)
         {
             System.Console.WriteLine("Student Updated!");
@@ -82,16 +84,16 @@ public class StudentRepository(Database database) : IStudentRepository
             System.Console.WriteLine("Student not found");
         }
     }
-    public int GetTotalStudentsCount()
+    public async Task<int> GetTotalStudentsCount()
     {
         using var con = _data.Connection();
         con.Open();
         var query = "select count(*) from students";
-        var result = con.ExecuteScalar<int>(query);
+        var result = await con.ExecuteScalarAsync<int>(query);
         return result;
     }
 
-    public List<Student> GetDroppedOutStudents()
+    public async Task<List<Student>> GetDroppedOutStudents()
     {
         using var con = _data.Connection();
         con.Open();
@@ -104,12 +106,11 @@ public class StudentRepository(Database database) : IStudentRepository
             where sg.studentid = s.studentid
             and sg.status = @Status
             )";
-        var result = con.Query<Student>(
-        query, new { Status = Status.Left }).ToList();
-        return result;
+        var result = await con.QueryAsync<Student>(query, new { Status = Status.Left });
+        return result.ToList();
     }
 
-    public List<Student> GetGraduatedStudents()
+    public async Task<List<Student>> GetGraduatedStudents()
     {
         using var con = _data.Connection();
         con.Open();
@@ -123,8 +124,7 @@ public class StudentRepository(Database database) : IStudentRepository
         where sg.studentid = s.studentid
         and sg.status = @Status
         )";
-        var result = con.Query<Student>(
-        query, new { Status = Status.Finished }).ToList();
-        return result;
+        var result = await con.QueryAsync<Student>(query, new { Status = Status.Finished });
+        return result.ToList();
     }
 }
