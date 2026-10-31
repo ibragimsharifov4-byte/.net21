@@ -104,15 +104,25 @@ public class CourseRepository(Database database) : ICourseRepository
         using var con = _data.Connection();
         con.Open();
         var query = @"
-        select
-        c.courseid as CourseId,
-        c.title as Title,
-        count(distinct sg.studentid) as StudentsCount
+        select s.fullname , c.title from courses c
+        join groups g on c.courseid = g.courseid
+        join students s on g.groupid = s.groupid";
+        var result = await con.QueryAsync<Course>(query);
+        return result.ToList();
+    }
+
+    public async Task<List<Course>> GetMostPopularCourse()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select c.title, count(s.studentid) as StudentsCount
         from courses c
-        left join groups g on c.courseid = g.courseid
-        left join studentgroups sg on g.groupid = sg.groupid
-        group by c.courseid, c.title
-        order by StudentsCount desc";
+        join groups g on c.courseid = g.courseid
+        join studentgroups sg on g.groupid = sg.groupid
+        join students s on sg.studentid = s.studentid
+        group by c.title
+        order by StudentsCount desc limit 1";
         var result = await con.QueryAsync<Course>(query);
         return result.ToList();
     }
@@ -122,17 +132,32 @@ public class CourseRepository(Database database) : ICourseRepository
         using var con = _data.Connection();
         con.Open();
         var query = @"
-        select
-        c.courseid as CourseId,
-        c.title as Title,
-        count(distinct sg.studentid) as StudentsCount
+        select c.title, count(s.studentid) as StudentsCount
         from courses c
-        left join groups g on c.courseid = g.courseid
-        left join studentgroups sg on g.groupid = sg.groupid
-        group by c.courseid, c.title
-        order by StudentsCount, c.courseid
-        limit 3";
+        join groups g on c.courseid = g.courseid
+        join studentgroups sg on g.groupid = sg.groupid
+        join students s on sg.studentid = s.studentid
+        group by c.title
+        order by StudentsCount desc";
         var result = await con.QueryAsync<Course>(query);
         return result.ToList();
     }
+
+    public async Task<List<Course>> GetTopThreeCourses()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select c.title, count(s.studentid) as StudentsCount
+        from courses c
+        join groups g on c.courseid = g.courseid
+        join studentgroups sg on g.groupid = sg.groupid
+        join students s on sg.studentid = s.studentid
+        group by c.title
+        order by StudentsCount desc limit 3";
+        var result = await con.QueryAsync<Course>(query);
+        return result.ToList();
+    }
+
+    
 }

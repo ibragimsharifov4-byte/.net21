@@ -93,23 +93,6 @@ public class StudentRepository(Database database) : IStudentRepository
         return result;
     }
 
-    public async Task<List<Student>> GetDroppedOutStudents()
-    {
-        using var con = _data.Connection();
-        con.Open();
-        var query = @"
-            select s.*
-            from students s
-            where exists (
-            select 1
-            from studentgroups sg
-            where sg.studentid = s.studentid
-            and sg.status = @Status
-            )";
-        var result = await con.QueryAsync<Student>(query, new { Status = Status.Left });
-        return result.ToList();
-    }
-
     public async Task<List<Student>> GetGraduatedStudents()
     {
         using var con = _data.Connection();
@@ -127,4 +110,41 @@ public class StudentRepository(Database database) : IStudentRepository
         var result = await con.QueryAsync<Student>(query, new { Status = Status.Finished });
         return result.ToList();
     }
+
+    public async Task<List<Student>> GetStudentsWithGroups()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"select s.fullname , g.groupname from students s
+        join studentgroups sg on s.studentid = sg.studentid
+        join groups g on sg.groupid = g.groupid";
+        var result = await con.QueryAsync<Student>(query);
+        return result.ToList();
+    }
+
+    public async Task<List<Student>> GetStudentsWithoutGroups()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"select s.fullname from students s
+        left join studentgroups sg on s.studentid = sg.studentid
+        where sg.studentid is null";
+        var result = await con.QueryAsync<Student>(query);
+        return result.ToList();
+    }
+
+    public async Task<List<Student>> GetDroppedOutStudents()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select s.* from students s 
+        join studentgroups sg on s.studentid = sg.studentid
+        where sg.status = @Status";
+        var result = await con.QueryAsync<Student>(query, new { Status = Status.Left });
+        return result.ToList();
+    }
+
+    
+
 }

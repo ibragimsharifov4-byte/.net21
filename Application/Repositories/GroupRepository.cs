@@ -115,15 +115,25 @@ public class GroupRepository(Database database) : IGroupRepository
         using var con = _data.Connection();
         con.Open();
         var query = @"
-        select
-        g.groupid as GroupId,
-        g.groupname as GroupName,
-        count(sg.studentid) as StudentsCount
-        from groups g
-        left join studentgroups sg on g.groupid = sg.groupid
-        group by g.groupid, g.groupname
-        order by g.groupid";
+        select g.groupname , s.fullname from groups g
+        join studentgroups sg on g.groupid = sg.groupid
+        join students s on sg.studentid = s.studentid";
         var result = await con.QueryAsync<Group>(query);
         return result.ToList();
     }
+
+    public async Task<List<Group>> GetEmptyGroups()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select g.*
+        from groups g
+        left join studentgroups sg on g.groupid = sg.groupid
+        where sg.studentid is null";
+        var result = await con.QueryAsync<Group>(query);
+        return result.ToList();
+    }
+
+    
 }

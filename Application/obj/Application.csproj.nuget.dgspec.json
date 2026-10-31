@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Application\\Application.csproj": {}
+    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Application\\Application.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Application\\Application.csproj": {
+    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Application\\Application.csproj",
+        "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\mardin it\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Application\\obj\\",
+        "outputPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mardin it\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -27,8 +27,8 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\Domain.csproj"
+              "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\Domain.csproj"
               }
             }
           }
@@ -353,14 +353,14 @@
         }
       }
     },
-    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\Domain.csproj": {
+    "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\Domain.csproj",
+        "projectPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\Domain.csproj",
         "packagesPath": "C:\\Users\\mardin it\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week4\\day3\\Domain\\obj\\",
+        "outputPath": "C:\\Users\\mardin it\\OneDrive\\Desktop\\.net projects\\week2\\day3\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mardin it\\AppData\\Roaming\\NuGet\\NuGet.Config"

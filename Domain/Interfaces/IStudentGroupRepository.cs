@@ -4,8 +4,8 @@ namespace Domain.Interfaces;
 
 public interface IStudentGroupRepository
 {
-    void AddStudentGroup(StudentGroup studentGroup);
-    void DeleteStudentGroup(int id);
-    void UpdateStudentGroup(StudentGroup studentGroup);
-    List<StudentGroup> GetStudentGroups();
+    Task AddStudentGroup(StudentGroup studentGroup);
+    Task DeleteStudentGroup(int id);
+    Task UpdateStudentGroup(StudentGroup studentGroup);
+    Task<List<StudentGroup>> GetStudentGroups();
 }

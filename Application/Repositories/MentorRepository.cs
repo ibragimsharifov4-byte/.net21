@@ -13,13 +13,10 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = @"
-            insert into mentors(fullname, email, phone, specialization)
-            values(@Fullname, @Email, @Phone, @Specialization)";
-
+        insert into mentors(fullname, email, phone, specialization)
+        values(@Fullname, @Email, @Phone, @Specialization)";
         var result = await con.ExecuteAsync(query, mentor);
-
         if (result > 0)
         {
             Console.WriteLine("Mentor added successfully");
@@ -34,11 +31,8 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = "delete from mentors where mentorid = @id";
-
         var result = await con.ExecuteAsync(query, new { id });
-
         if (result > 0)
         {
             Console.WriteLine("Mentor is deleted");
@@ -53,11 +47,8 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = "select * from mentors where mentorid = @id";
-
         var result = await con.QueryFirstOrDefaultAsync<Mentor>(query, new { id });
-
         if (result == null)
         {
             Console.WriteLine("Mentor not found");
@@ -73,11 +64,8 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = "select * from mentors";
-
         var result = await con.QueryAsync<Mentor>(query);
-
         return result.ToList();
     }
 
@@ -85,17 +73,14 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = @"
-            update mentors
-            set fullname = @Fullname,
-                email = @Email,
-                phone = @Phone,
-                specialization = @Specialization
-            where mentorid = @MentorId";
-
+        update mentors
+        set fullname = @Fullname,
+        email = @Email,
+        phone = @Phone,
+        specialization = @Specialization
+        where mentorid = @MentorId";
         var result = await con.ExecuteAsync(query, mentor);
-
         if (result > 0)
         {
             Console.WriteLine("Mentor updated successfully");
@@ -110,11 +95,24 @@ public class MentorRepository(Database database) : IMentorRepository
     {
         using var con = _data.Connection();
         con.Open();
-
         var query = "select count(*) from mentors";
-
         var result = await con.ExecuteScalarAsync<int>(query);
-
         return result;
     }
+
+    public async Task<List<Mentor>> GetMentorWithMostStudents()
+    {
+        using var con = _data.Connection();
+        con.Open();
+        var query = @"
+        select m.fullname, count(sg.studentid) as StudentsCount from mentors m
+        join groups g on m.mentorid = g.mentorid
+        join studentgroups sg on g.groupid = sg.groupid
+        group by m.fullname
+        order by StudentsCount desc limit 1";
+        var result = await con.QueryAsync<Mentor>(query);
+        return result.ToList();
+    }
+
+    
 }
